@@ -1,7 +1,6 @@
 <h1 align="center">
 <img src="Spy.png" alt=""/>
 <p>SpyF</p>
-<hr />
 </h1>
 
 ## Overview
