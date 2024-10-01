@@ -13,12 +13,12 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class MercadoLivreService {
+public class MercadoLibreService {
 
     private final MercadoLibreConfig mercadoLibreConfig;
     private final ObjectMapper objectMapper;
 
-    public MercadoLivreService(MercadoLibreConfig mercadoLibreConfig, ObjectMapper objectMapper) {
+    public MercadoLibreService(MercadoLibreConfig mercadoLibreConfig, ObjectMapper objectMapper) {
         this.mercadoLibreConfig = mercadoLibreConfig;
         this.objectMapper = objectMapper;
     }
@@ -29,7 +29,7 @@ public class MercadoLivreService {
         JsonNode resultsNode = jsonNode.get("results");
 
         if (resultsNode == null || !resultsNode.isArray() || resultsNode.isEmpty()) {
-            throw new RuntimeException("No results found for the product: " + productName);
+            return null;
         }
 
         List<JsonNode> filteredProducts = new ArrayList<>();
