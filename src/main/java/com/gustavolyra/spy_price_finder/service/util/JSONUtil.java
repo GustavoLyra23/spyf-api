@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.gustavolyra.spy_price_finder.service.exceptions.JsonException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class JSONUtil {
@@ -25,7 +26,9 @@ public class JSONUtil {
     }
 
     public static JsonNode findBestProduct(List<JsonNode> filteredProducts) {
-        return null;
+        return filteredProducts.stream()
+                .min(Comparator.comparingDouble(product -> product.get("price").asDouble()))
+                .orElseThrow(RuntimeException::new);
     }
 
 
