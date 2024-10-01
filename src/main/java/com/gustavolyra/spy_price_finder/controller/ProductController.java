@@ -1,14 +1,14 @@
 package com.gustavolyra.spy_price_finder.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gustavolyra.spy_price_finder.dto.ProductDto;
+import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.service.ProductService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/v1/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -17,10 +17,17 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/api/find-product")
+    @GetMapping("/best-product")
     public ResponseEntity<ProductDto> findBestProduct(@RequestParam String productName,
                                                       @RequestParam(defaultValue = "0.0") Double productMinPrice) throws JsonProcessingException {
         var bestProduct = productService.findBestProduct(productName, productMinPrice);
         return ResponseEntity.ok(bestProduct);
+    }
+
+    @PostMapping("/offer-watcher/{url}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> watchOffer(@PathVariable("url") String url) {
+        productService.watchOffer(url);
+        return ResponseEntity.ok("Check your email regularly for updates on the product price");
     }
 }

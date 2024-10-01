@@ -1,7 +1,7 @@
 package com.gustavolyra.spy_price_finder.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gustavolyra.spy_price_finder.dto.ProductDto;
+import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,4 +30,7 @@ public class ProductService {
     }
 
 
+    public void watchOffer(String url) {
+        //TODO
+    }
 }

@@ -3,7 +3,7 @@ package com.gustavolyra.spy_price_finder.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gustavolyra.spy_price_finder.dto.ProductDto;
+import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.service.exceptions.HttpConectionException;
 import com.gustavolyra.spy_price_finder.service.exceptions.JsonException;
 import com.gustavolyra.spy_price_finder.service.util.JSONUtil;
@@ -47,6 +47,8 @@ public class AmazonScrappingService {
 
         } catch (JsonProcessingException e) {
             throw new JsonException(e.getMessage());
+        } catch (RuntimeException e) {
+            return null;
         }
     }
 
@@ -54,9 +56,11 @@ public class AmazonScrappingService {
     private String getHttpResponse(String productName) {
         try {
             String country = "br";
-            String url = "https://api.scraperapi.com/structured/amazon/search?api_key=" + apiKey + "&query=" + productName + "&country=" + country;
+            String tld = "com.br";
+            String url = "https://api.scraperapi.com/structured/amazon/search?api_key=" + apiKey
+                    + "&query=" + productName + "&country=" + country + "&tld=" + tld;
             URL urlForGetRequest = new URL(url);
-            String readLine = null;
+            String readLine;
             HttpURLConnection conection = (HttpURLConnection) urlForGetRequest.openConnection();
             conection.setRequestMethod("GET");
             int responseCode = conection.getResponseCode();

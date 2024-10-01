@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gustavolyra.spy_price_finder.config.MercadoLibreConfig;
-import com.gustavolyra.spy_price_finder.dto.ProductDto;
+import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.service.util.JSONUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

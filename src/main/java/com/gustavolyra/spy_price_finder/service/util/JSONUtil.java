@@ -9,6 +9,10 @@ import java.util.List;
 
 public class JSONUtil {
 
+    private JSONUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void isNodeValid(JsonNode resultsNode) {
         if (resultsNode == null || !resultsNode.isArray() || resultsNode.isEmpty()) {
             throw new JsonException("No results found");
