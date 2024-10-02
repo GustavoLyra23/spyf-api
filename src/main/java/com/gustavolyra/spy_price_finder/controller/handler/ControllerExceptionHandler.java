@@ -3,6 +3,7 @@ package com.gustavolyra.spy_price_finder.controller.handler;
 import com.gustavolyra.spy_price_finder.dto.error.ErrorDto;
 import com.gustavolyra.spy_price_finder.dto.error.FieldErrorDto;
 import com.gustavolyra.spy_price_finder.dto.error.ValidationErrorDto;
+import com.gustavolyra.spy_price_finder.service.exceptions.HttpConectionException;
 import com.gustavolyra.spy_price_finder.service.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,13 @@ public class ControllerExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 validationError.addFieldError(new FieldErrorDto(error.getField(), error.getDefaultMessage())));
         return ResponseEntity.status(status).body(validationError);
+    }
+
+    @ExceptionHandler(HttpConectionException.class)
+    public ResponseEntity<ErrorDto> handleHttpConectionException(HttpConectionException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        var errorDto = new ErrorDto(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(errorDto);
     }
 
 

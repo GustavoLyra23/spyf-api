@@ -1,7 +1,8 @@
 package com.gustavolyra.spy_price_finder.dto.user;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,8 @@ public class UserDto {
     @Email(message = "Email should be valid")
     private String email;
 
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$", message =
-            "Password should have at least 8 characters, one letter and one number")
+    @Size(min = 6, message = "Password should have at least 6 characters")
+    @NotBlank(message = "Password should not be blank")
     private String password;
 
 

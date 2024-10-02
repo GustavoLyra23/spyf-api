@@ -26,11 +26,10 @@ public class AuthService {
     public String login(UserDto userDto) {
         var user = userRepository.findByEmail(userDto.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        if (passwordEncoder.matches(passwordEncoder.encode(userDto.getPassword()), user.getPassword())) {
-            return tokenGeneratorUtil.generateToken(user);
+        if (!passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
+            throw new UnathorizedException("Invalid Credentials");
         }
-
-        throw new UnathorizedException("Invalid Credentials");
+        return tokenGeneratorUtil.generateToken(user);
     }
 
 

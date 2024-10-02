@@ -23,7 +23,7 @@ public class MercadoLibreService {
     }
 
     public ProductDto findProduct(String productName, Double productMinPrice) throws JsonProcessingException {
-        ResponseEntity<String> responseEntity = mercadoLibreConfig.getSearchResultsPaginated(productName, 0, 50);
+        ResponseEntity<String> responseEntity = mercadoLibreConfig.getSearchResultsPaginated(productName, 0, 20);
         JsonNode jsonNode = objectMapper.readTree(responseEntity.getBody());
         JsonNode resultsNode = jsonNode.get("results");
 

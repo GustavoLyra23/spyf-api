@@ -1,6 +1,7 @@
 package com.gustavolyra.spy_price_finder.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gustavolyra.spy_price_finder.dto.UrlDto;
 import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.service.ProductService;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,10 @@ public class ProductController {
         return ResponseEntity.ok(bestProduct);
     }
 
-    @PostMapping("/offer-watcher/{url}")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> watchOffer(@PathVariable("url") String url) {
-        productService.watchOffer(url);
+    @PostMapping("/offer-watcher")
+//    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> watchOffer(@RequestBody UrlDto dto) {
+        productService.watchOffer(dto.url());
         return ResponseEntity.ok("Check your email regularly for updates on the product price");
     }
 }
