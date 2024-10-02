@@ -26,7 +26,7 @@ public class ProductController {
     }
 
     @PostMapping("/offer-watcher")
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<String> watchOffer(@RequestBody UrlDto dto) {
         productService.watchOffer(dto.url());
         return ResponseEntity.ok("Check your email regularly for updates on the product price");

@@ -2,27 +2,25 @@ package com.gustavolyra.spy_price_finder.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import com.gustavolyra.spy_price_finder.entities.Product;
+import com.gustavolyra.spy_price_finder.repository.ProductRepository;
+import com.gustavolyra.spy_price_finder.service.util.UserUtil;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
 
     private final MercadoLibreService mercadoLibreService;
     private final AmazonScrappingService amazonScrappingService;
+    private final ProductRepository productRepository;
+    private final ScrapService scrapService;
 
-
-    public ProductService(MercadoLibreService mercadoLibreService, AmazonScrappingService amazonScrappingService) {
+    public ProductService(MercadoLibreService mercadoLibreService, AmazonScrappingService amazonScrappingService, ProductRepository productRepository, ScrapService scrapService) {
         this.mercadoLibreService = mercadoLibreService;
         this.amazonScrappingService = amazonScrappingService;
+        this.productRepository = productRepository;
+        this.scrapService = scrapService;
     }
 
     public ProductDto findBestProduct(String productName, Double productMinPrice) throws JsonProcessingException {
@@ -38,57 +36,22 @@ public class ProductService {
         return mercadoLibreProduct.price() < amazonProduct.price() ? mercadoLibreProduct : amazonProduct;
     }
 
+    @Transactional
     public void watchOffer(String url) {
-        if (!(!url.contains("mercadolivre") || !url.contains("amazon"))) {
-            throw new IllegalArgumentException("Invalid URL");
+        var optional = productRepository.findByLink(url);
+        if (optional.isEmpty()) {
+            Product product = new Product();
+            var productdto = scrapService.scrapPageFromUrl(url);
+            product.setLink(url);
+            product.setTitle(productdto.title());
+            product.setPrice(productdto.price());
+            product.getUsers().add(UserUtil.findUserFromAuthenticationContext());
+            productRepository.save(product);
+        } else {
+            Product product = optional.get();
+            product.getUsers().add(UserUtil.findUserFromAuthenticationContext());
+            productRepository.save(product);
         }
-        System.setProperty("webdriver.edge.driver", "C:\\Users\\gustavo\\Downloads\\edgedriver_win64 (1)\\msedgedriver.exe");
-        WebDriver driver = new EdgeDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        try {
-            driver.get(url);
-            WebElement productTitleElement = findProductTitle(driver, url);
-
-            if (productTitleElement != null) {
-                String productTitle = productTitleElement.getText();
-                System.out.println("Título do Produto: " + productTitle);
-                WebElement priceElement = findProductPrice(driver, url);
-
-                if (priceElement != null) {
-                    String price = priceElement.getText();
-                    System.out.println("Preço do Produto: " + price);
-                } else {
-                    System.out.println("Preço não encontrado");
-                }
-            } else {
-                System.out.println("Produto não encontrado");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            driver.quit();
-        }
-    }
-
-    private WebElement findProductTitle(WebDriver driver, String url) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        if (url.contains("mercadolivre")) {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h1.ui-pdp-title")));
-        } else if (url.contains("amazon")) {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("productTitle")));
-        }
-        return null;
-    }
-
-    private WebElement findProductPrice(WebDriver driver, String url) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        if (url.contains("mercadolivre")) {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".andes-money-amount__fraction")));
-        } else if (url.contains("amazon")) {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("priceblock_ourprice")));
-        }
-        return null;
     }
 
 
