@@ -41,15 +41,17 @@
 - **Parameters**:
     - `url` (String): The URL of the product to watch.
 - **Response**: Confirms that the user will receive email updates on the product price.
+(the url must be form Amazon or Mercado Livre)
 
 ## Technologies Used
 
-- **Java**
+- **Java 21**
 - **Spring Boot**
 - **Maven**
 - **Jackson** for JSON processing
 - **Spring Security** for authentication
 - **WebClient** for API calls
+- **SendGrid** for email sending
 
 ## Getting Started
 
