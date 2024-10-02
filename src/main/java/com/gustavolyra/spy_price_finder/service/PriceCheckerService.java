@@ -10,9 +10,15 @@ import java.io.IOException;
 public class PriceCheckerService {
 
 
-    private ProductRepository productRepository;
-    private ScrapService scrapService;
-    private MailService mailService;
+    private final ProductRepository productRepository;
+    private final ScrapService scrapService;
+    private final MailService mailService;
+
+    public PriceCheckerService(ProductRepository productRepository, ScrapService scrapService, MailService mailService) {
+        this.productRepository = productRepository;
+        this.scrapService = scrapService;
+        this.mailService = mailService;
+    }
 
     @Scheduled(cron = "0 0 */1 * * *")
     private void checkPriceAndNotify() {
