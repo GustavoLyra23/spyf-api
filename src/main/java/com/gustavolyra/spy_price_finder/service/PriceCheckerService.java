@@ -1,5 +1,6 @@
 package com.gustavolyra.spy_price_finder.service;
 
+import com.gustavolyra.spy_price_finder.entities.Product;
 import com.gustavolyra.spy_price_finder.repository.ProductRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,19 +25,25 @@ public class PriceCheckerService {
     @Scheduled(cron = "0 0 */1 * * *")
     public void checkPriceAndNotify() {
         var products = productRepository.findAll();
-        products.forEach(product -> {
-            Double currentPrice = scrapService.scrapPageFromUrl(product.getLink()).price();
-            if (currentPrice < product.getPrice()) {
-                product.setPrice(currentPrice);
-                productRepository.save(product);
-                product.getUsers().forEach(user -> {
-                    try {
-                        mailService.sendEmail(user.getEmail(), "The product " + product.getTitle() + " has a new price: " + currentPrice);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+
+        for (Product product : products) {
+            try {
+                Double currentPrice = scrapService.scrapPageFromUrl(product.getLink()).price();
+                if (currentPrice < product.getPrice()) {
+                    product.setPrice(currentPrice);
+                    productRepository.save(product);
+                    product.getUsers().forEach(user -> {
+                        try {
+                            mailService.sendEmail(user.getEmail(), "The product " + product.getTitle() + " has a new price: " + currentPrice);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                productRepository.delete(product);
             }
-        });
+        }
+
     }
 }

@@ -27,7 +27,7 @@ public class Product {
     private String link;
 
     private Double price;
-
+    ;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tb_user_product",
             joinColumns = @JoinColumn(name = "product_id"),

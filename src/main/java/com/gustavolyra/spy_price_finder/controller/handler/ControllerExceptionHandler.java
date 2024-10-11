@@ -48,4 +48,12 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(status).body(errorDto);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        var errorDto = new ErrorDto(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(errorDto);
+    }
+
+
 }
