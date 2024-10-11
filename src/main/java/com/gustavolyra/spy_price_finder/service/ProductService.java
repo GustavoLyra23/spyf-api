@@ -4,39 +4,37 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.entities.Product;
 import com.gustavolyra.spy_price_finder.repository.ProductRepository;
-import com.gustavolyra.spy_price_finder.service.exceptions.ResourceNotFoundException;
 import com.gustavolyra.spy_price_finder.service.util.UserUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class ProductService {
 
     private final MercadoLibreService mercadoLibreService;
-    private final AmazonScrappingService amazonScrappingService;
+    private final AmazonService amazonService;
     private final ProductRepository productRepository;
     private final ScrapService scrapService;
 
-    public ProductService(MercadoLibreService mercadoLibreService, AmazonScrappingService amazonScrappingService, ProductRepository productRepository, ScrapService scrapService) {
+    public ProductService(MercadoLibreService mercadoLibreService, AmazonService amazonService, ProductRepository productRepository, ScrapService scrapService) {
         this.mercadoLibreService = mercadoLibreService;
-        this.amazonScrappingService = amazonScrappingService;
+        this.amazonService = amazonService;
         this.productRepository = productRepository;
         this.scrapService = scrapService;
     }
 
-    public ProductDto findBestProduct(String productName, Double productMinPrice) throws JsonProcessingException {
-        ProductDto mercadoLibreProduct = mercadoLibreService.findProduct(productName, productMinPrice);
-        ProductDto amazonProduct = amazonScrappingService.scrapAmazonProduct(productName, productMinPrice);
-
-        if (mercadoLibreProduct == null && amazonProduct == null) {
-            throw new ResourceNotFoundException("No product found");
-        } else if (mercadoLibreProduct == null) {
-            return amazonProduct;
-        } else if (amazonProduct == null) {
-            return mercadoLibreProduct;
-        }
-
-        return mercadoLibreProduct.price() < amazonProduct.price() ? mercadoLibreProduct : amazonProduct;
+    public List<ProductDto> findBestProduct(String productName, Double productMinPrice) throws JsonProcessingException {
+        var mercadoLibreList = mercadoLibreService.findProduct(productName, productMinPrice);
+        var amazonList = amazonService.scrapAmazonProduct(productName, productMinPrice);
+        List<ProductDto> bestProducts = new ArrayList<>();
+        bestProducts.addAll(mercadoLibreList);
+        bestProducts.addAll(amazonList);
+        return bestProducts.stream().sorted(Comparator.comparingDouble(ProductDto::price))
+                .limit(5).toList();
     }
 
     @Transactional

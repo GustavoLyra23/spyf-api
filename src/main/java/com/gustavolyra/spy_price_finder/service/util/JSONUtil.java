@@ -29,10 +29,15 @@ public class JSONUtil {
         return filteredProducts;
     }
 
-    public static JsonNode findBestProduct(List<JsonNode> filteredProducts) {
+    public static List<JsonNode> findBestProduct(List<JsonNode> filteredProducts) {
+        if (filteredProducts.isEmpty()) {
+            return filteredProducts;
+        }
+
         return filteredProducts.stream()
-                .min(Comparator.comparingDouble(product -> product.get("price").asDouble()))
-                .orElse(null);
+                .sorted(Comparator.comparingDouble(product -> product.get("price").asDouble()))
+                .limit(5)
+                .toList();
     }
 
 

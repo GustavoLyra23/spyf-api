@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.service.exceptions.HttpConectionException;
-import com.gustavolyra.spy_price_finder.service.exceptions.JsonException;
 import com.gustavolyra.spy_price_finder.service.util.JSONUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,41 +17,34 @@ import java.net.URL;
 import java.util.List;
 
 @Service
-public class AmazonScrappingService {
+public class AmazonService {
 
     @Value("${scrap.api.key}")
     private String apiKey;
     private final ObjectMapper objectMapper;
 
-    public AmazonScrappingService(ObjectMapper objectMapper) {
+    public AmazonService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public ProductDto scrapAmazonProduct(String productName, double productMinPrice) {
-        try {
-            var response = getHttpResponse(productName);
+    public List<ProductDto> scrapAmazonProduct(String productName, double productMinPrice) throws JsonProcessingException {
+
+        var response = getHttpResponse(productName);
 
             JsonNode jsonNode = objectMapper.readTree(response);
             JsonNode resultsNode = jsonNode.get("results");
 
             JSONUtil.isNodeValid(resultsNode);
             List<JsonNode> filteredProducts = JSONUtil.filterProducts(resultsNode, productMinPrice);
-            JsonNode bestProduct = JSONUtil.findBestProduct(filteredProducts);
-            if (bestProduct == null) {
-                return null;
-            }
-
-            double minPrice = bestProduct.get("price").asDouble();
-            String minPriceLink = bestProduct.get("url").asText();
-            String minPriceTitle = bestProduct.get("name").asText();
-
-            return new ProductDto(minPrice, minPriceLink, minPriceTitle);
-
-        } catch (JsonProcessingException e) {
-            throw new JsonException(e.getMessage());
-        } catch (RuntimeException e) {
+        var jsonNodes = JSONUtil.findBestProduct(filteredProducts);
+        if (jsonNodes.isEmpty()) {
             return null;
         }
+
+        return jsonNodes.stream()
+                .map(product -> new ProductDto(product.get("price").asDouble(),
+                        product.get("url").asText(), product.get("name").asText()))
+                .toList();
     }
 
 

@@ -22,7 +22,7 @@ public class MercadoLibreService {
         this.objectMapper = objectMapper;
     }
 
-    public ProductDto findProduct(String productName, Double productMinPrice) throws JsonProcessingException {
+    public List<ProductDto> findProduct(String productName, Double productMinPrice) throws JsonProcessingException {
         ResponseEntity<String> responseEntity = mercadoLibreConfig.getSearchResultsPaginated(productName, 0, 20);
         JsonNode jsonNode = objectMapper.readTree(responseEntity.getBody());
         JsonNode resultsNode = jsonNode.get("results");
@@ -30,15 +30,12 @@ public class MercadoLibreService {
         JSONUtil.isNodeValid(resultsNode);
 
         List<JsonNode> filteredProducts = JSONUtil.filterProducts(resultsNode, productMinPrice);
-        JsonNode bestProduct = JSONUtil.findBestProduct(filteredProducts);
 
-        if (bestProduct == null) {
+        var jsonNodes = JSONUtil.findBestProduct(filteredProducts);
+        if (jsonNodes.isEmpty()) {
             return null;
         }
 
-        double minPrice = bestProduct.get("price").asDouble();
-        String minPriceLink = bestProduct.get("permalink").asText();
-        String minPriceTitle = bestProduct.get("title").asText();
-        return new ProductDto(minPrice, minPriceLink, minPriceTitle);
+        return jsonNodes.stream().map(product -> new ProductDto(product.get("price").asDouble(), product.get("permalink").asText(), product.get("title").asText())).toList();
     }
 }
