@@ -23,7 +23,7 @@ public class ProductController {
     @GetMapping("/best-product")
     public ResponseEntity<List<ProductDto>> findBestProduct(@RequestParam String productName,
                                                             @RequestParam(defaultValue = "0.0") Double productMinPrice) throws JsonProcessingException {
-        var bestProduct = productService.findBestProduct(productName.trim(), productMinPrice);
+        var bestProduct = productService.findBestProduct(productName, productMinPrice);
         return ResponseEntity.ok(bestProduct);
     }
 

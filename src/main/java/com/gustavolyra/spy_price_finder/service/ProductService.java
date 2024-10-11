@@ -28,9 +28,20 @@ public class ProductService {
     }
 
     public List<ProductDto> findBestProduct(String productName, Double productMinPrice) throws JsonProcessingException {
-        var mercadoLibreList = mercadoLibreService.findProduct(productName, productMinPrice);
-        var amazonList = amazonService.scrapAmazonProduct(productName, productMinPrice);
+        String mercadoLibreProduct = productName.trim();
+        var mercadoLibreList = mercadoLibreService.findProduct(mercadoLibreProduct, productMinPrice);
+        String amazonProduct = productName.replace(" ", "%20");
+        var amazonList = amazonService.scrapAmazonProduct(amazonProduct, productMinPrice);
         List<ProductDto> bestProducts = new ArrayList<>();
+
+        if (mercadoLibreList == null && amazonList == null) {
+            return bestProducts;
+        } else if (mercadoLibreList == null) {
+            return amazonList;
+        } else if (amazonList == null) {
+            return mercadoLibreList;
+        }
+
         bestProducts.addAll(mercadoLibreList);
         bestProducts.addAll(amazonList);
         return bestProducts.stream().sorted(Comparator.comparingDouble(ProductDto::price))
