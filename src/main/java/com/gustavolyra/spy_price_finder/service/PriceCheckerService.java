@@ -3,12 +3,12 @@ package com.gustavolyra.spy_price_finder.service;
 import com.gustavolyra.spy_price_finder.repository.ProductRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
 @Service
 public class PriceCheckerService {
-
 
     private final ProductRepository productRepository;
     private final ScrapService scrapService;
@@ -20,8 +20,9 @@ public class PriceCheckerService {
         this.mailService = mailService;
     }
 
+    @Transactional
     @Scheduled(cron = "0 0 */1 * * *")
-    private void checkPriceAndNotify() {
+    public void checkPriceAndNotify() {
         var products = productRepository.findAll();
         products.forEach(product -> {
             Double currentPrice = scrapService.scrapPageFromUrl(product.getLink()).price();

@@ -38,6 +38,9 @@ public class AmazonScrappingService {
             JSONUtil.isNodeValid(resultsNode);
             List<JsonNode> filteredProducts = JSONUtil.filterProducts(resultsNode, productMinPrice);
             JsonNode bestProduct = JSONUtil.findBestProduct(filteredProducts);
+            if (bestProduct == null) {
+                return null;
+            }
 
             double minPrice = bestProduct.get("price").asDouble();
             String minPriceLink = bestProduct.get("url").asText();

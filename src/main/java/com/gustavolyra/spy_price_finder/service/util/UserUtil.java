@@ -9,7 +9,6 @@ public class UserUtil {
         throw new IllegalStateException("Utility class");
     }
 
-
     public static User findUserFromAuthenticationContext() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();

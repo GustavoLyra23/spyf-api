@@ -1,7 +1,7 @@
 package com.gustavolyra.spy_price_finder.service.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.gustavolyra.spy_price_finder.service.exceptions.JsonException;
+import com.gustavolyra.spy_price_finder.service.exceptions.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,7 +15,7 @@ public class JSONUtil {
 
     public static void isNodeValid(JsonNode resultsNode) {
         if (resultsNode == null || !resultsNode.isArray() || resultsNode.isEmpty()) {
-            throw new JsonException("No results found");
+            throw new ResourceNotFoundException("No results found");
         }
     }
 
@@ -32,7 +32,7 @@ public class JSONUtil {
     public static JsonNode findBestProduct(List<JsonNode> filteredProducts) {
         return filteredProducts.stream()
                 .min(Comparator.comparingDouble(product -> product.get("price").asDouble()))
-                .orElseThrow(RuntimeException::new);
+                .orElse(null);
     }
 
 

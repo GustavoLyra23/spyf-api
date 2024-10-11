@@ -34,7 +34,6 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users = new HashSet<>();
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

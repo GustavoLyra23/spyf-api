@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gustavolyra.spy_price_finder.dto.product.ProductDto;
 import com.gustavolyra.spy_price_finder.entities.Product;
 import com.gustavolyra.spy_price_finder.repository.ProductRepository;
+import com.gustavolyra.spy_price_finder.service.exceptions.ResourceNotFoundException;
 import com.gustavolyra.spy_price_finder.service.util.UserUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,9 @@ public class ProductService {
         ProductDto mercadoLibreProduct = mercadoLibreService.findProduct(productName, productMinPrice);
         ProductDto amazonProduct = amazonScrappingService.scrapAmazonProduct(productName, productMinPrice);
 
-        if (mercadoLibreProduct == null) {
+        if (mercadoLibreProduct == null && amazonProduct == null) {
+            throw new ResourceNotFoundException("No product found");
+        } else if (mercadoLibreProduct == null) {
             return amazonProduct;
         } else if (amazonProduct == null) {
             return mercadoLibreProduct;
@@ -53,7 +56,6 @@ public class ProductService {
             productRepository.save(product);
         }
     }
-
 
 }
 

@@ -32,10 +32,13 @@ public class MercadoLibreService {
         List<JsonNode> filteredProducts = JSONUtil.filterProducts(resultsNode, productMinPrice);
         JsonNode bestProduct = JSONUtil.findBestProduct(filteredProducts);
 
+        if (bestProduct == null) {
+            return null;
+        }
+
         double minPrice = bestProduct.get("price").asDouble();
         String minPriceLink = bestProduct.get("permalink").asText();
         String minPriceTitle = bestProduct.get("title").asText();
-
         return new ProductDto(minPrice, minPriceLink, minPriceTitle);
     }
 }

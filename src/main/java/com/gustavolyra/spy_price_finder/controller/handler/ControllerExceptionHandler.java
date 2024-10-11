@@ -43,10 +43,9 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpConectionException.class)
     public ResponseEntity<ErrorDto> handleHttpConectionException(HttpConectionException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus status = HttpStatus.BAD_GATEWAY;
         var errorDto = new ErrorDto(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(errorDto);
     }
-
 
 }
