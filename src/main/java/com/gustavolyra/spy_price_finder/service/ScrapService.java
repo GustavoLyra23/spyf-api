@@ -21,7 +21,7 @@ public class ScrapService {
         if (!(!url.contains("mercadolivre") || !url.contains("amazon"))) {
             throw new IllegalArgumentException("Invalid URL");
         }
-        System.setProperty("webdriver.edge.driver", "C:\\Users\\gustavo\\Downloads\\edgedriver_win64 (1)\\msedgedriver.exe");
+        System.setProperty("webdriver.edge.driver", "/usr/local/bin/msedgedriver");
         WebDriver driver = new EdgeDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
