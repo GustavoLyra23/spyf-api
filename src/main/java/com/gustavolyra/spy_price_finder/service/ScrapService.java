@@ -24,6 +24,7 @@ public class ScrapService {
         System.setProperty("webdriver.edge.driver", "C:\\Users\\gustavo\\Downloads\\edgedriver_win64 (1)\\msedgedriver.exe");
         WebDriver driver = new EdgeDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
         try {
             driver.get(url);
             WebElement productTitleElement = findProductTitle(driver, url);
