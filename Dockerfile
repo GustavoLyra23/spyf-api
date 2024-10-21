@@ -1,24 +1,34 @@
+# Use uma imagem base com o Debian (Ubuntu)
+FROM openjdk:21-jdk-slim
 
-FROM openjdk:21-jdk
-
+# Definir diretório de trabalho
 WORKDIR /app
 
+# Instalar dependências necessárias, Microsoft Edge e Edge WebDriver
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
-    install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/ && \
-    sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge.list' && \
-    rm microsoft.gpg && \
+    apt-get install -y \
+    curl \
+    gnupg \
+    apt-transport-https \
+    ca-certificates \
+    software-properties-common \
+    unzip && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg && \
+    echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge.list && \
     apt-get update && \
     apt-get install -y microsoft-edge-stable
 
-RUN apt-get install -yqq unzip && \
-    curl -o /tmp/edgedriver.zip https://msedgedriver.azureedge.net/115.0.1901.203/edgedriver_linux64.zip && \
+# Baixar e instalar o Microsoft Edge WebDriver
+RUN curl -o /tmp/edgedriver.zip https://msedgedriver.azureedge.net/115.0.1901.203/edgedriver_linux64.zip && \
     unzip /tmp/edgedriver.zip -d /usr/local/bin/ && \
     rm /tmp/edgedriver.zip
 
+# Copia o seu código para o container
 COPY . .
 
+# Compila o projeto usando Maven
 RUN ./mvnw clean package -DskipTests
 
-CMD ["java", "-jar", "target/proxy-cache-server-1.0-SNAPSHOT.jar"]
+# Comando para rodar a aplicação
+CMD ["java", "-jar", "target/spy-price-finder-0.0.1-SNAPSHOT.jar"]
+
